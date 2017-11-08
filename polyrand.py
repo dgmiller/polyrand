@@ -1,6 +1,5 @@
 # tools for plotting roots of random polynomials
 import numpy as np
-np.random.seed(25)
 import scipy.stats
 import matplotlib.pyplot as plt
 
@@ -86,6 +85,7 @@ def poly_roots(params,basis='power',dx=None,plot_range=1,return_values=False):
             # compute the derivative
             if dx >= 1:
                 dP = P.deriv(m=i)
+                plt.plot(x,dP(x),color='r',alpha=.5)
                 dR = dP.roots()
                 dX.append(dR.real)
                 dY.append(dR.imag)
@@ -97,16 +97,16 @@ def poly_roots(params,basis='power',dx=None,plot_range=1,return_values=False):
                 dY.append(dR.imag)
             
     # plot the random polynomial
-    plt.plot(x,P(x),color='r',alpha=.2,lw=2)
+    plt.plot(x,P(x),color='k',alpha=.7,lw=2)
     plt.xlabel('x')
     plt.ylabel('y')
     plt.title("P(x), degree %s" % (len(coeffs)-1))
 
     plt.subplot(1,2,2)
-    plt.scatter(X,Y,alpha=.3,s=10)
+    plt.scatter(X,Y,alpha=.8,s=10)
     if dx is not None:
         for dx_,dy_ in zip(dX,dY):
-            plt.scatter(dx_,dy_,alpha=.1,s=10,color='r')
+            plt.scatter(dx_,dy_,alpha=.3,s=10,color='r')
     plt.title("The Roots of P(x), degree %s" % (len(coeffs)-1))
     plt.xlabel('real')
     plt.ylabel('imag')
