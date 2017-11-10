@@ -94,21 +94,35 @@ def plot_poly_roots(polylist,extras=None,x=np.linspace(-1,1,101)):
     """
     x = np.linspace(-1,1,101)
 
-    plt.figure(figsize=(16,8))
-    plt.subplot(1,2,1)
+    plt.figure(figsize=(16,16))
+    plt.subplot(2,2,2)
     plt.plot(x,np.zeros_like(x),color='grey',alpha=.5)
 
     for P in polylist:
         plt.plot(x,P(x))
 
-    plt.subplot(1,2,2)
+    plt.subplot(2,2,3)
     plt.plot(x,np.zeros_like(x),color='grey',alpha=.5)
     plt.plot(np.zeros_like(x),x,color='grey',alpha=.5)
     for P in polylist:
+        plt.subplot(2,2,3)
         r = P.roots()
+        
         plt.scatter(r.real,r.imag,s=100,alpha=.2)
         plt.axis('equal')
+        plt.xlim(-1.5,1.5)
+        plt.ylim(-1.5,1.5)
+        
+        plt.subplot(2,2,1)
+        plt.hist(r.real,alpha=.5)
+        plt.xlim(-1.5,1.5)
+        
+        plt.subplot(2,2,4)
+        plt.hist(r.imag,alpha=.5,orientation='horizontal')
+        plt.ylim(-1.5,1.5)
+        
         if extras:
+            plt.subplot(2,2,3)
             for e in extras:
                 plt.scatter(e.real,e.imag,color='k',alpha=.8)
     plt.show()
