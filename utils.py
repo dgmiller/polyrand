@@ -1,6 +1,7 @@
 import numpy as np
 from sympy import mpmath
 import scipy.stats
+from scipy.optimize import newton
 import matplotlib.pyplot as plt
 
 
@@ -114,11 +115,11 @@ def plot_poly_roots(polylist,extras=None,x=np.linspace(-1,1,101)):
         plt.ylim(-1.5,1.5)
         
         plt.subplot(2,2,1)
-        plt.hist(r.real,alpha=.5)
+        plt.hist(r.real,bins=int(len(r)/3),alpha=.3)
         plt.xlim(-1.5,1.5)
         
         plt.subplot(2,2,4)
-        plt.hist(r.imag,alpha=.5,orientation='horizontal')
+        plt.hist(r.imag,bins=int(len(r)/3),alpha=.3,orientation='horizontal')
         plt.ylim(-1.5,1.5)
         
         if extras:
@@ -126,10 +127,3 @@ def plot_poly_roots(polylist,extras=None,x=np.linspace(-1,1,101)):
             for e in extras:
                 plt.scatter(e.real,e.imag,color='k',alpha=.8)
     plt.show()
-    
-def animate_fractional_deriv(P):
-    """
-    Show the continuous deformation of the roots via fractional derivatives.
-    
-    """
-    mpmath.differint(P,r)

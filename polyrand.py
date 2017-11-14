@@ -1,6 +1,7 @@
 # tools for plotting roots of random polynomials
 import numpy as np
 import scipy.stats
+from scipy.special import gamma
 import matplotlib.pyplot as plt
 
 
@@ -50,7 +51,7 @@ def p_type(coeffs, basis='power'):
 
 
 # generate several random polynomials with various distributions and plot their roots
-def poly_roots(params,basis='power',dx=None,plot_range=1,return_values=False,niters=1):
+def poly_roots(params,basis='power',dx=None,plot_range=1,correction=False,return_values=False,niters=1):
     """
     Plot random polynomials and their roots with coefficients specified by params.
     
@@ -92,7 +93,10 @@ def poly_roots(params,basis='power',dx=None,plot_range=1,return_values=False,nit
                     dY.append(dR.imag)
                 # compute the antiderivative and add a standard normal constant
                 elif dx <= -1:
-                    Pint = P.integ(m=i,k=np.random.randn(abs(i)))
+                    constants = np.random.randn(abs(i))
+                    if correction:
+                        constants *= np.array([gamma(abs(dx)-j) for j in range(i)])
+                    Pint = P.integ(m=i,k=constants)
                     dR = Pint.roots()
                     dX.append(dR.real)
                     dY.append(dR.imag)
