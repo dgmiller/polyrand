@@ -129,3 +129,78 @@ def poly_roots(params,basis='power',dx=None,plot_range=1,correction=False,return
     if return_values:
         return X,Y,dX,dY
 
+
+def plot_poly_roots(polylist,extras=None,x=np.linspace(-1,1,101)):
+    """
+    plot a polynomial P and its roots
+    
+    P is a list of polynomials
+    """
+    x = np.linspace(-1,1,101)
+
+    plt.figure(figsize=(16,16))
+    plt.subplot(2,2,2)
+    plt.plot(x,np.zeros_like(x),color='grey',alpha=.5)
+
+    for P in polylist:
+        plt.plot(x,P(x))
+
+    plt.subplot(2,2,3)
+    plt.plot(x,np.zeros_like(x),color='grey',alpha=.5)
+    plt.plot(np.zeros_like(x),x,color='grey',alpha=.5)
+    for P in polylist:
+        plt.subplot(2,2,3)
+        r = P.roots()
+        
+        plt.scatter(r.real,r.imag,s=100,alpha=.2)
+        plt.axis('equal')
+        plt.xlim(-1.5,1.5)
+        plt.ylim(-1.5,1.5)
+        
+        plt.subplot(2,2,1)
+        plt.hist(r.real,bins=int(len(r)/3),alpha=.3)
+        plt.xlim(-1.5,1.5)
+        
+        plt.subplot(2,2,4)
+        plt.hist(r.imag,bins=int(len(r)/3),alpha=.3,orientation='horizontal')
+        plt.ylim(-1.5,1.5)
+        
+        if extras:
+            plt.subplot(2,2,3)
+            for e in extras:
+                plt.scatter(e.real,e.imag,color='k',alpha=.8)
+    plt.show()
+
+    
+    
+def find_roots_x(d,stop_deg=2,basis='power',correction=True,perturb=None):
+    """
+    d is the degree of the original random polynomial
+    stop_deg is stop after reaching a certain degree
+    
+    """
+
+    coeffs = np.random.randn(d+1)
+    coeffs[-1] = 1
+    P = np.polynomial.polynomial.Polynomial(coeffs)
+    if basis == 'chebyshev':
+        P = P.convert(kind=np.polynomial.Chebyshev)
+    
+    constants = coeffs[:-stop_deg-1]
+    constants = constants[::-1]
+    if correction:
+        for i in range(len(constants)):
+            constants[i] *= gamma(len(constants)-i)
+    dP = P.deriv(m=d-stop_deg)
+    if perturb:
+        dP.coef += np.random.normal(perturb[0],perturb[1],size=len(dP.coef))
+
+    P_ = dP.integ(m=d-stop_deg,k=constants)
+    
+    plot_poly_roots([P,P_])
+    plt.figure(figsize=(16,4))
+    plt.title("Polynomial Coefficients")
+    plt.bar(np.arange(d+1),P.coef,alpha=.3)
+    plt.bar(np.arange(d+1),P_.coef,alpha=.3)
+    plt.show()
+    
