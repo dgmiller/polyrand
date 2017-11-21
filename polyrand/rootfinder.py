@@ -9,12 +9,17 @@ from IPython.display import HTML
 def G(k,a):
     return (gamma(k+1)/gamma(k-a+1))
 
+def F(k,a):
+    return (gamma(k-a)/gamma(k))
+
 def frac_deriv(coeffs,a):
     """
     The Matrix Fractional Derivative of a polynomial with given coefficients
     Returns the companion matrix of the fractional derivative of the polynomial with coeffs
     
     """
+    # define the G function
+    
     n = int(np.floor(a))
     if coeffs[-1] != 1:
         coeffs /= coeffs[-1]
@@ -35,9 +40,17 @@ def frac_antideriv(coeffs,a,const):
     Compute the fractional antiderivative of a polynomial
     
     """
-    n = int(np.ceil(a))
-    assert coeffs[-1] == 1
-    k = len(coeffs) - 1 # degree of polynomial
+    n = int(np.floor(a))
+    #assert coeffs[-1] == 1
+    k = len(coeffs) + len(const) - 1 # degree of antiderivative polynomial
+    coeffs = np.append(const,coeffs)
+    
+    # build the companion matrix of the full antiderivative polynomial
+    C = np.diag(np.ones(k-1),-1)
+    C[:k-n,-1] = -coeffs[:-1]
+    
+    # Begin changing the coefficients
+    C[:-2,-1] *= np.array([F(i,a) for i in range(n,k)])
 
 def frac_deriv_poly(P,a,x,roots=False):
     """
