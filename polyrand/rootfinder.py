@@ -38,7 +38,7 @@ def frac_antideriv(coeffs,a,const):
     Compute the fractional antiderivative of a polynomial
     
     """
-    n = int(np.floor(a))
+    n = int(np.ceil(a))
     k = len(coeffs) + len(const) - 1
     
     # modify the coefficients
@@ -112,11 +112,15 @@ def timelapse(P,start,stop,n_frames,plot_axis=True):
     
     
 
-def animate_roots(coeffs,start,stop,n_frames=200,t_interval=75,plot_trail=True):
+def animate_roots(coeffs,start=None,stop=None,n_frames=200,t_interval=75,plot_trail=True):
     """
     Animate the continuous deformation of the roots of fractional derivatives.
     
     """
+    if start == None:
+        start = 0.
+    if stop == None:
+        stop = len(coeffs) - 2
 
     fig = plt.figure(figsize=(8,8))
     ax = plt.gca()

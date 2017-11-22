@@ -5,7 +5,7 @@ from scipy.special import gamma
 import matplotlib.pyplot as plt
 
 
-def random_coeffs(params,imag=False):
+def random_coeffs(params,imag=False,add_one=True):
     """
     INPUT
         params (list) tuples specifying distribution type (str), args (list), and kwargs (dict).
@@ -31,7 +31,8 @@ def random_coeffs(params,imag=False):
         if imag:
             coeffs.astype(np.complex64)
             coeffs.imag = dist[dist_name](*params,**kwargs)
-    coeffs = np.append(coeffs,np.array([1.]))
+    if add_one:
+        coeffs = np.append(coeffs,np.array([1.]))
     return coeffs
 
 
@@ -138,18 +139,18 @@ def plot_poly_roots(polylist,extras=None,x=np.linspace(-1,1,101)):
     """
     x = np.linspace(-1,1,101)
 
-    plt.figure(figsize=(16,16))
-    plt.subplot(2,2,2)
+    plt.figure(figsize=(16,8))
+    plt.subplot(1,2,1)
     plt.plot(x,np.zeros_like(x),color='grey',alpha=.5)
 
     for P in polylist:
         plt.plot(x,P(x))
 
-    plt.subplot(2,2,3)
+    plt.subplot(1,2,2)
     plt.plot(x,np.zeros_like(x),color='grey',alpha=.5)
     plt.plot(np.zeros_like(x),x,color='grey',alpha=.5)
     for P in polylist:
-        plt.subplot(2,2,3)
+        plt.subplot(1,2,2)
         r = P.roots()
         
         plt.scatter(r.real,r.imag,s=100,alpha=.2)
@@ -157,16 +158,8 @@ def plot_poly_roots(polylist,extras=None,x=np.linspace(-1,1,101)):
         plt.xlim(-1.5,1.5)
         plt.ylim(-1.5,1.5)
         
-        plt.subplot(2,2,1)
-        plt.hist(r.real,bins=int(len(r)/3),alpha=.3)
-        plt.xlim(-1.5,1.5)
-        
-        plt.subplot(2,2,4)
-        plt.hist(r.imag,bins=int(len(r)/3),alpha=.3,orientation='horizontal')
-        plt.ylim(-1.5,1.5)
-        
         if extras:
-            plt.subplot(2,2,3)
+            plt.subplot(1,2,2)
             for e in extras:
                 plt.scatter(e.real,e.imag,color='k',alpha=.8)
     plt.show()
@@ -179,8 +172,14 @@ def find_roots_x(d,stop_deg=2,basis='power',correction=True,perturb=None):
     stop_deg is stop after reaching a certain degree
     
     """
+    
+    if d == 75:
+        params = [('normal',[0,1],{'size':25}), ('gamma',[2,2],{'size':25}), ('beta',[.5,.5],{'size':25})]
+        coeffs = random_coeffs(params)
+    else:
+        coeffs = np.random.randn(d+1)
+        coeffs[-1] = 1.
 
-    coeffs = np.random.randn(d+1)
     coeffs[-1] = 1
     P = np.polynomial.polynomial.Polynomial(coeffs)
     if basis == 'chebyshev':
