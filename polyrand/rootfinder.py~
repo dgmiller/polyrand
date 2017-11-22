@@ -39,13 +39,18 @@ def frac_antideriv(coeffs,a,const):
     
     """
     n = int(np.floor(a))
-    k = len(coeffs) + len(const) - 1
+    #assert coeffs[-1] == 1
+    k = len(coeffs) + len(const) - 1 # degree of antiderivative polynomial
+    coeffs = np.append(const,coeffs)
     
-    # modify the coefficients
-    coeffs *= np.array([F(i,a) for i in range(n,k)])
-    const /= np.array([gamma(i) for i in range(1,len(const)+1)])
-    return np.append(const,coeffs)
-
+    # build the companion matrix of the full antiderivative polynomial
+    C = np.diag(np.ones(k-1),-1)
+    C[:,-1] = -coeffs[:-1]
+    
+    # Begin changing the coefficients
+    C[n:,-1] *= np.array([F(i,a) for i in range(n,k)])
+    C[:n,-1] /= np.array([gamma(i) for i in range(1,len(const)+1)])
+    return C
 
 def frac_deriv_poly(P,a,x,roots=False):
     """
@@ -161,14 +166,14 @@ def animate_roots(coeffs,start,stop,n_frames=200,t_interval=75,plot_trail=True):
 
 
 
-def cheb_nodes(a,b,n):
+def cheb_nodes(n):
     """
     get the chebyshev nodes between 0 and 1
     
     """
     nodes = []
     for k in range(1,n+1):
-        nodes.append(.5*(b+a) + .5*(b-a)*np.cos((2*k-1)*np.pi/(2*n)))
+        nodes.append(.5 + .5*np.cos((2*k-1)*np.pi/(2*n)))
     return np.sort(np.array(nodes))[::-1]
 
 
@@ -208,7 +213,7 @@ def newton_integration(coeffs,n_steps,dx=3):
             # Newton's method to find roots of function to optimize
             Zeros = []
             for r in R[-1]: # which are roots of P0
-                z = newton(P1,np.complex128(r))
+                z = newton(P1,r)
                 Zeros.append(z)
             R.append(np.array(Zeros))
             

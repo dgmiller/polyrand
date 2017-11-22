@@ -102,16 +102,16 @@ def poly_roots(params,basis='power',dx=None,plot_range=1,correction=False,return
                     dY.append(dR.imag)
 
         # plot the random polynomial
-        plt.plot(x,P(x),color='k',alpha=.7,lw=2)
+        plt.plot(x,P(x),color='k',alpha=.3,lw=2)
         plt.xlabel('x')
         plt.ylabel('y')
         plt.title("P(x), degree %s" % (len(coeffs)-2))
 
         plt.subplot(1,2,2)
-        plt.scatter(X,Y,alpha=.1,s=10)
+        plt.scatter(X,Y,alpha=.4,s=10)
         if dx is not None:
             for dx_,dy_ in zip(dX,dY):
-                plt.scatter(dx_,dy_,alpha=.1,s=10,color=colors[step%3])
+                plt.scatter(dx_,dy_,alpha=.1,s=50,color=colors[step%3])
         plt.title("The Roots of P(x), degree %s" % (len(coeffs)-2))
         plt.xlabel('real')
         plt.ylabel('imag')

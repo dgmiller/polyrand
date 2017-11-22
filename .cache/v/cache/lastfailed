@@ -1,0 +1,4 @@
+{
+  "tests/test_polyrand.py": true,
+  "tests/test_rootfinder.py": true
+}
