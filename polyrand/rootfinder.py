@@ -80,10 +80,18 @@ def plot_frac_deriv_example(n=15):
     plt.plot(x,dP(x),color='r')
     for a in np.linspace(.01,2,n):
         plt.plot(x,frac_deriv_poly(P,a,x),color='red',alpha=.3)
+    plt.title("Example of the Fractional Derivatives of $f(x) = x^2$")
     plt.show()
     
 
-def timelapse(P,start,stop,n_frames,plot_axis=True):
+def timelapse(coeffs,start,stop,n_frames,basis='power',plot_axis=True):
+    
+    if basis == 'power':
+        P = np.polynomial.polynomial.Polynomial(coeffs)
+    elif basis == 'chebyshev':
+        P = np.polynomial.chebyshev.Chebyshev(coeffs)
+    else:
+        raise ValueError("%s is not a polynomial class" % basis)
 
     plt.figure(figsize=(8,8))
     if plot_axis:
@@ -127,15 +135,20 @@ def animate_roots(coeffs,start=None,stop=None,n_frames=200,t_interval=75,plot_tr
 
     plt.xlim((-1.5,1.5))
     plt.ylim((-1.5,1.5))
+    plt.legend()
 
     points, = plt.plot([], [], color='r', marker='o', ls='None')
     line, = plt.plot([], [], color='orange', marker='o', ls='None', alpha=.08)
+    greyline, = plt.plot([], [], color='grey', marker='o', ls='None', alpha=.02)
+    deriv_text, = plt.text(.02, 1.3, "", transform=ax.transAxes)
 
     # initialization function: plot the background of each frame
     def init():
+        greyline.set_data([],[])
         line.set_data([], [])
         points.set_data([], [])
-        return (line, points,)
+        deriv_text.set_text("")
+        return (greyline, line, points, deriv_text,)
 
     # animation function. This is called sequentially
     def animate(i):
@@ -144,19 +157,34 @@ def animate_roots(coeffs,start=None,stop=None,n_frames=200,t_interval=75,plot_tr
         
         # plot trail
         if plot_trail:
+            # store the roots that will make the orange trail
             trail = np.array([])
+            # store the roots that will make the grey trail
+            greytrail = np.array([])
+            
+            # make the orange trail
             for j in range(max(i-25,0),i):
                 fD_past = frac_deriv(coeffs,a[j])
                 f_ew_past = np.linalg.eig(fD_past)[0]
                 trail = np.append(trail,f_ew_past)
             line.set_data(trail.real, trail.imag)
-        
+            
+            # make the grey trail
+            for j in range(max(i-25,0)):
+                fD_past = frac_deriv(coeffs,a[j])
+                f_ew_past = np.linalg.eig(fD_past)[0]
+                greytrail = np.append(greytrail,f_ew_past)
+            greyline.set_data(greytrail.real, greytrail.imag)
+                
+        # get the current roots (red)
         fD = frac_deriv(coeffs,a[i])
-        # get eigenvalues
         f_ew = np.linalg.eig(fD)[0]
         points.set_data(f_ew.real, f_ew.imag)
         
-        return (line, points,)
+        # update derivative info
+        deriv_text.set_text("dx = %s" % a)
+        
+        return (greyline, line, points, deriv_text,)
 
     # call the animator. blit=True means only re-draw the parts that have changed.
     anim = animation.FuncAnimation(fig, animate, init_func=init, frames=n_frames, interval=t_interval, blit=False)
