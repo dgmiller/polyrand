@@ -52,7 +52,7 @@ def p_type(coeffs, basis='power'):
 
 
 # generate several random polynomials with various distributions and plot their roots
-def poly_roots(coeffs,basis='power',dx=None,plot_range=1,correction=False,return_values=False,niters=1):
+def poly_roots(coeffs,basis='power',dx=None,plot_range=1,correction=False,return_values=False,plot_lim=[(-1.5,1.5),(-1.5,1.5)],niters=1):
     """
     Plot random polynomials and their roots with coefficients specified by params.
     
@@ -118,11 +118,11 @@ def poly_roots(coeffs,basis='power',dx=None,plot_range=1,correction=False,return
         plt.ylabel('imag')
     
     if dx is None:
-        plt.xlim(-1.5,1.5)
-        plt.ylim(-1.5,1.5)
+        plt.xlim(plot_lim[0])
+        plt.ylim(plot_lim[1])
     elif dx >= 1:
-        plt.xlim(-1.5,1.5)
-        plt.ylim(-1.5,1.5)
+        plt.xlim(plot_lim[0])
+        plt.ylim(plot_lim[1])
     elif dx <= -1:
         plt.axis('equal')
     plt.show()

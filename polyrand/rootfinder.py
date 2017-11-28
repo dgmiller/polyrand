@@ -135,21 +135,17 @@ def animate_roots(coeffs,start=None,stop=None,n_frames=200,t_interval=75,plot_tr
     
     plt.xlim(plot_range[0])
     plt.ylim(plot_range[1])
-    #plt.legend()
 
     points, = plt.plot([], [], color='r', marker='o', ls='None')
-    #points, = plt.plot([], [], marker='o', ls='None')
 
     line, = plt.plot([], [], color='orange', marker='o', ls='None', alpha=.08)
     greyline, = plt.plot([], [], color='grey', marker='o', ls='None', alpha=.02)
-    #deriv_text, = plt.text(.02, 1.3, "", transform=ax.transAxes)
 
     # initialization function: plot the background of each frame
     def init():
         greyline.set_data([],[])
         line.set_data([], [])
         points.set_data([], [])
-        #deriv_text.set_text("")
         return (greyline, line, points,)
 
     # animation function. This is called sequentially
@@ -182,9 +178,7 @@ def animate_roots(coeffs,start=None,stop=None,n_frames=200,t_interval=75,plot_tr
         fD = frac_deriv(coeffs,a[i])
         f_ew = np.linalg.eig(fD)[0]
         points.set_data(f_ew.real, f_ew.imag)
-        
-        # update derivative info
-        #deriv_text.set_text("dx = %s" % a)
+
         
         return (greyline, line, points,)
 
@@ -210,40 +204,9 @@ def cheb_nodes(a,b,n):
 def newton_integration(coeffs,n_steps,dx=3):
     """
     NIRF (Integration)
-    NERF (Eigenvalue)
     NARF (Antiderivative)
     N*RF (Newton * Root Finding)
     Use newton's method to integrate the roots of a polynomial up to a different polynomial.
     
     """
-    # check that the last coefficient is 1
-    assert coeffs[-1] == 1
-    R = [] # stores the previous computed roots
-    
-    # chebyshev nodes for differintegrating
-    #c = .5*(a+b) + .5*(b-a)*np.cos((2*k-1)*np.pi/(2*n))
-    
-    # Find known roots of a derivative
-    P = np.polynomial.polynomial.Polynomial(coeffs)
-    d = P.degree()
-    P0 = P.deriv(m=d-dx)
-    print("dx degree",P0.degree())
-    R.append(P0.roots())
-    
-    for n in np.arange(1,d-dx)[::-1]:
-        print(n)
-        for a in cheb_nodes(n_steps):
-            print('\t',n+a)
-            # define the function to optimize
-            P1 = frac_deriv(coeffs,)
-            coef_opt = -1*P1[:,-1]
-            P1 = np.polynomial.polynomial.Polynomial(coef_opt)
-
-            # Newton's method to find roots of function to optimize
-            Zeros = []
-            for r in R[-1]: # which are roots of P0
-                z = newton(P1,np.complex128(r))
-                Zeros.append(z)
-            R.append(np.array(Zeros))
-            
-    return R
+    raise NotImplementedError
