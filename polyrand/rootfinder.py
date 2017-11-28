@@ -120,7 +120,7 @@ def timelapse(coeffs,start,stop,n_frames,basis='power',plot_axis=True):
     
     
 
-def animate_roots(coeffs,start=None,stop=None,n_frames=200,t_interval=75,plot_trail=True):
+def animate_roots(coeffs,start=None,stop=None,n_frames=200,t_interval=75,plot_trail=True,plot_range=[(-1.5,1.5),(-1.5,1.5)]):
     """
     Animate the continuous deformation of the roots of fractional derivatives.
     
@@ -132,23 +132,25 @@ def animate_roots(coeffs,start=None,stop=None,n_frames=200,t_interval=75,plot_tr
 
     fig = plt.figure(figsize=(8,8))
     ax = plt.gca()
-
-    plt.xlim((-1.5,1.5))
-    plt.ylim((-1.5,1.5))
-    plt.legend()
+    
+    plt.xlim(plot_range[0])
+    plt.ylim(plot_range[1])
+    #plt.legend()
 
     points, = plt.plot([], [], color='r', marker='o', ls='None')
+    #points, = plt.plot([], [], marker='o', ls='None')
+
     line, = plt.plot([], [], color='orange', marker='o', ls='None', alpha=.08)
     greyline, = plt.plot([], [], color='grey', marker='o', ls='None', alpha=.02)
-    deriv_text, = plt.text(.02, 1.3, "", transform=ax.transAxes)
+    #deriv_text, = plt.text(.02, 1.3, "", transform=ax.transAxes)
 
     # initialization function: plot the background of each frame
     def init():
         greyline.set_data([],[])
         line.set_data([], [])
         points.set_data([], [])
-        deriv_text.set_text("")
-        return (greyline, line, points, deriv_text,)
+        #deriv_text.set_text("")
+        return (greyline, line, points,)
 
     # animation function. This is called sequentially
     def animate(i):
@@ -182,9 +184,9 @@ def animate_roots(coeffs,start=None,stop=None,n_frames=200,t_interval=75,plot_tr
         points.set_data(f_ew.real, f_ew.imag)
         
         # update derivative info
-        deriv_text.set_text("dx = %s" % a)
+        #deriv_text.set_text("dx = %s" % a)
         
-        return (greyline, line, points, deriv_text,)
+        return (greyline, line, points,)
 
     # call the animator. blit=True means only re-draw the parts that have changed.
     anim = animation.FuncAnimation(fig, animate, init_func=init, frames=n_frames, interval=t_interval, blit=False)
