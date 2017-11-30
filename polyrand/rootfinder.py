@@ -12,26 +12,37 @@ def G(k,a):
 def F(k,a):
     return (gamma(k-a+1)/gamma(k+1))
 
-def frac_deriv(coeffs,a):
+def frac_deriv(coeffs,a,return_coeffs=False):
     """
     The Matrix Fractional Derivative of a polynomial with given coefficients
     Returns the companion matrix of the fractional derivative of the polynomial with coeffs
     
     """    
-    n = int(np.floor(a))
-    if coeffs[-1] != 1:
-        coeffs /= coeffs[-1]
+    n = int(np.floor(a)) # the integer to differentiate
     k = len(coeffs) - 1 # degree of polynomial
     
-    # Build the companion matrix of the full polynomial
-    C = np.diag(np.ones(k-1),-1) # companion matrix
-    C[:,-1] = -coeffs[:-1]
+    if return_coeffs:
+        
+        dx_coeffs = coeffs[n:].copy()
+        dx_coeffs *= np.array([G(i,a) for i in range(n,k+1)])
+        return dx_coeffs
     
-    # Cut the companion matrix by the integer derivative amount
-    D = C[n:,n:]
-    D[:,-1] /= G(k,a)
-    D[:,-1] *= np.array([G(i,a) for i in range(n,k)])
-    return D
+    else:
+        
+        # adjust the leading coefficient to be 1.
+        if coeffs[-1] != 1:
+            coeffs /= coeffs[-1]
+            
+        # Build the companion matrix of the full polynomial
+        C = np.diag(np.ones(k-1),-1) # companion matrix
+        C[:,-1] = -coeffs[:-1]
+
+        # Cut the companion matrix by the integer derivative amount
+        D = C[n:,n:]
+        D[:,-1] /= G(k,a)
+        D[:,-1] *= np.array([G(i,a) for i in range(n,k)])
+        return D
+
 
 def frac_antideriv(coeffs,a,const):
     """
