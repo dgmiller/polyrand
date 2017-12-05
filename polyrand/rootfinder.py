@@ -44,20 +44,6 @@ def frac_deriv(coeffs,a,return_coeffs=False):
         return D
 
 
-def frac_antideriv(coeffs,a,const):
-    """
-    Compute the fractional antiderivative of a polynomial
-    
-    """
-    n = int(np.ceil(a))
-    k = len(coeffs) + len(const) - 1
-    
-    # modify the coefficients
-    coeffs *= np.array([F(i,a) for i in range(n,k)])
-    const /= np.array([gamma(i) for i in range(1,len(const)+1)])
-    return np.append(const,coeffs)
-
-
 def frac_deriv_poly(P,a,x,roots=False):
     """
     Take the ath fractional derivative of polynomial P.
@@ -212,12 +198,70 @@ def cheb_nodes(a,b,n):
 
 
 
-def newton_integration(coeffs,n_steps,dx=3):
+def newton_integration(coeffs,dx,n=5,show=False):
     """
-    NIRF (Integration)
-    NARF (Antiderivative)
-    N*RF (Newton * Root Finding)
+    NIRF (Newton Integration Root Finding)
     Use newton's method to integrate the roots of a polynomial up to a different polynomial.
     
+    A fazer:
+        + find optimal value for dx
+        + find optimal partition (optimal n)
+        + find good guess for new root value at zero
+    
     """
-    raise NotImplementedError
+    # define the partition of fractional differentiation terms
+    a = np.linspace(0,dx,n+1)
+    
+    # Find known roots of a derivative
+    D = frac_deriv(coeffs,dx)
+    R_ = np.linalg.eig(D)[0]
+    Roots = R_[R_.imag >= 0].copy()
+    
+    # plot the solution we hope to get to and the starting roots
+    if show:
+        R = np.polynomial.polynomial.Polynomial(coeffs).roots()
+        plt.figure(figsize=(8,8))
+        plt.scatter(R.real,R.imag,color='k',alpha=.2,s=150)
+        plt.scatter(Roots.real,Roots.imag,color='k',label="Derivative Roots")
+    
+    step = 0
+    for i in range(n+1):
+
+        # define the function to optimize
+        F_coeffs = frac_deriv(coeffs,dx-a[i],return_coeffs=True)
+        P = np.polynomial.polynomial.Polynomial(F_coeffs)
+        
+        # determines whether to add a new root at zero(ish)        
+        if (step < np.floor(a[i])):
+            m = np.median(Roots[Roots.imag==0].real)
+            Z = [np.sign(m)*.01 + .01j] #Z = [np.sign(m)*.01 + 0.j]
+            step = np.floor(a[i])
+        else:
+            Z = []
+
+        # Newton's method to find roots of function to optimize
+        for r in Roots:
+            
+            f = lambda x: P(x)/x**(a[i])
+                
+            
+            z = newton(f,r)
+            # ignore negative complex region to save on flops
+            if z.imag < 0:
+                Z.append(np.conjugate(z))
+            else:
+                Z.append(z)
+        
+        Roots = np.array(Z)
+        
+        if show:
+            plt.scatter(Roots.real,Roots.imag,color='orange',alpha=.2)
+        
+    if show:
+        plt.scatter(Roots.real,Roots.imag,color='r',alpha=.5)
+        Roots_ = np.conjugate(Roots)
+        plt.axis('equal')
+        plt.legend()
+        plt.show()
+        
+    return Roots
