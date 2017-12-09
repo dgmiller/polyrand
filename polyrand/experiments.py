@@ -3,6 +3,8 @@ import numpy as np
 import scipy.stats
 from scipy.special import gamma
 import matplotlib.pyplot as plt
+from matplotlib import animation,rc
+from IPython.display import HTML
 
 
 def random_coeffs(params,imag=False,add_one=True):
@@ -144,17 +146,13 @@ def poly_deriv_roots(coeffs,basis='power',dx=1,niters=1,show_dx_roots=True):
     """
 
     
-    fig = plt.figure(figsize=(12,6))
+    fig = plt.figure(figsize=(8,8))
     x = np.linspace(-1,1,100) # used for plotting P(x)
     X = [] # to store the real part of the roots
     Y = [] # to store the imaginary part of the roots
     dX = []
     dY = []
-    plt.subplot(1,2,1) # the first subplot shows the polynomial on the xy plane
-    plt.plot(x,np.zeros_like(x),color='grey') # plots the line y=0
     for i in range(niters):
-        #coeffs = random_coeffs(params)
-        #P = np.polynomial.polynomial.Polynomial(coeffs)
         P = p_type(coeffs,basis)
         dP = P.deriv(m=dx)
         R = P.roots() # get the roots of P(x)
@@ -163,18 +161,48 @@ def poly_deriv_roots(coeffs,basis='power',dx=1,niters=1,show_dx_roots=True):
         Y.append(R.imag)
         dX.append(dR.real)
         dY.append(dR.imag)
-        plt.plot(x,P(x),color='r',alpha=.2,lw=2)
-    plt.xlabel('x')
-    plt.ylabel('y')
-    plt.title("P(x), degree %s" % (len(coeffs)-1))
 
-    plt.subplot(1,2,2)
-    plt.scatter(X,Y,alpha=.3,s=10)
+    plt.scatter(X,Y,s=10,alpha=.7)
     if show_dx_roots:
-        plt.scatter(dX,dY,alpha=.3,s=10,color='r')
+        plt.scatter(dX,dY,s=10,alpha=.7,color='r')
     plt.title("The Roots of P(x), degree %s" % (len(coeffs)-1))
     plt.xlabel('real')
     plt.ylabel('imag')
     plt.xlim(-1.5,1.5)
     plt.ylim(-1.5,1.5)
     plt.show()
+    
+    
+    
+def deriv_roots_animation():
+    params = [('normal',[0,1],{'size':100})]
+    coeffs = random_coeffs(params)
+
+    # try also with chebyshev basis
+
+    X,Y,dX,dY = poly_roots(coeffs,basis='power',dx=100,return_values=True)
+
+    fig = plt.figure(figsize=(8,8))
+    ax = plt.gca()
+
+    plt.xlim((-1,1))
+    plt.ylim((-1,1))
+
+    line, = plt.plot([], [], 'ro', alpha=.4)
+
+    # initialization function: plot the background of each frame
+    def init():
+        line.set_data([], [])
+        return (line,)
+
+    # animation function. This is called sequentially
+    def animate(i):
+        x = dX[i]
+        y = dY[i]
+        line.set_data(x, y)
+        return (line,)
+
+    # call the animator. blit=True means only re-draw the parts that have changed.
+    anim = animation.FuncAnimation(fig, animate, init_func=init, frames=100, interval=50)#, blit=True)
+
+    HTML(anim.to_html5_video())

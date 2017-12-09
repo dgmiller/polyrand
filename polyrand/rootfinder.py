@@ -234,7 +234,7 @@ def newton_integration(coeffs,dx,n=5,show=False):
         # determines whether to add a new root at zero(ish)        
         if (step < np.floor(a[i])):
             m = np.median(Roots[Roots.imag==0].real)
-            Z = [np.sign(m)*.01 + .01j] #Z = [np.sign(m)*.01 + 0.j]
+            Z = [np.sign(m)*.01 + .01j]
             step = np.floor(a[i])
         else:
             Z = []
@@ -243,8 +243,6 @@ def newton_integration(coeffs,dx,n=5,show=False):
         for r in Roots:
             
             f = lambda x: P(x)/x**(a[i])
-                
-            
             z = newton(f,r)
             # ignore negative complex region to save on flops
             if z.imag < 0:
