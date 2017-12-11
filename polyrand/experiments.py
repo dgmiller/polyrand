@@ -108,7 +108,7 @@ def poly_roots(coeffs,basis='power',dx=None,plot_range=1,correction=False,return
         plt.plot(x,P(x),color='k',alpha=.3,lw=2)
         plt.xlabel('x')
         plt.ylabel('y')
-        plt.title("P(x), degree %s" % (len(coeffs)-2))
+        plt.title("P(x), degree %s" % (len(coeffs)-1))
 
         plt.subplot(1,2,2)
         plt.scatter(X,Y,alpha=.4,s=10)
@@ -154,11 +154,11 @@ def poly_deriv_roots(coeffs,basis='power',dx=1,niters=1,show_dx_roots=True):
     dY = []
     for i in range(niters):
         P = p_type(coeffs,basis)
-        dP = P.deriv(m=dx)
         R = P.roots() # get the roots of P(x)
-        dR = dP.roots()
         X.append(R.real)
         Y.append(R.imag)
+        dP = P.deriv(m=dx)
+        dR = dP.roots()
         dX.append(dR.real)
         dY.append(dR.imag)
 
@@ -205,4 +205,4 @@ def deriv_roots_animation():
     # call the animator. blit=True means only re-draw the parts that have changed.
     anim = animation.FuncAnimation(fig, animate, init_func=init, frames=100, interval=50)#, blit=True)
 
-    HTML(anim.to_html5_video())
+    return HTML(anim.to_html5_video())
