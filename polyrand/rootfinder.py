@@ -135,8 +135,8 @@ def animate_roots(coeffs,start=None,stop=None,n_frames=200,t_interval=75,plot_tr
 
     points, = plt.plot([], [], color='r', marker='o', ls='None')
 
-    line, = plt.plot([], [], color='orange', marker='o', ls='None', alpha=.08)
-    greyline, = plt.plot([], [], color='grey', marker='o', ls='None', alpha=.02)
+    line, = plt.plot([], [], color='orange', marker='o', ls='None', alpha=.16)
+    greyline, = plt.plot([], [], color='grey', marker='o', ls='None', alpha=.04)
 
     # initialization function: plot the background of each frame
     def init():
