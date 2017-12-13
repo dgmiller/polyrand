@@ -143,7 +143,7 @@ def animate_roots(coeffs,start=None,stop=None,n_frames=200,t_interval=75,plot_tr
         greyline.set_data([],[])
         line.set_data([], [])
         points.set_data([], [])
-        return (greyline, line, points,)
+        return (points, line, greyline,)
 
     # animation function. This is called sequentially
     def animate(i):
@@ -177,7 +177,7 @@ def animate_roots(coeffs,start=None,stop=None,n_frames=200,t_interval=75,plot_tr
         points.set_data(f_ew.real, f_ew.imag)
 
         
-        return (greyline, line, points,)
+        return (points, line, greyline,)
 
     # call the animator. blit=True means only re-draw the parts that have changed.
     anim = animation.FuncAnimation(fig, animate, init_func=init, frames=n_frames, interval=t_interval, blit=False)
@@ -224,7 +224,7 @@ def newton_integration(coeffs,dx,n=5,show=False):
         plt.scatter(R.real,R.imag,color='k',alpha=.2,s=150)
         plt.scatter(Roots.real,Roots.imag,color='k',label="Derivative Roots")
     
-    step = 0
+    step = 0 # records how many integer antiderivatives we have taken
     for i in range(n+1):
 
         # define the function to optimize
@@ -233,8 +233,9 @@ def newton_integration(coeffs,dx,n=5,show=False):
         
         # determines whether to add a new root at zero(ish)        
         if (step < np.floor(a[i])):
-            m = np.median(Roots[Roots.imag==0].real)
-            Z = [np.sign(m)*.01 + .01j]
+            # add a positive or negative value depending on Descartes Rule of Signs
+            pm = np.sign(F_coeffs[0])*np.sign(F_coeffs[1])
+            Z = [.01 + .01j, -.01 + .01j]
             step = np.floor(a[i])
         else:
             Z = []
