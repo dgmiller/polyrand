@@ -143,7 +143,7 @@ def animate_roots(coeffs,start=None,stop=None,n_frames=200,t_interval=75,plot_tr
         greyline.set_data([],[])
         line.set_data([], [])
         points.set_data([], [])
-        return (points, line, greyline,)
+        return (greyline, line, points,)
 
     # animation function. This is called sequentially
     def animate(i):
@@ -177,7 +177,7 @@ def animate_roots(coeffs,start=None,stop=None,n_frames=200,t_interval=75,plot_tr
         points.set_data(f_ew.real, f_ew.imag)
 
         
-        return (points, line, greyline,)
+        return (greyline, line, points,)
 
     # call the animator. blit=True means only re-draw the parts that have changed.
     anim = animation.FuncAnimation(fig, animate, init_func=init, frames=n_frames, interval=t_interval, blit=False)
@@ -212,6 +212,9 @@ def newton_integration(coeffs,dx,n=5,show=False):
     # define the partition of fractional differentiation terms
     a = np.linspace(0,dx,n+1)
     
+    # initialize the coefficients to be used for Descartes Rule of Signs
+    signs = np.sign(coeffs)
+    
     # Find known roots of a derivative
     D = frac_deriv(coeffs,dx)
     R_ = np.linalg.eig(D)[0]
@@ -234,9 +237,13 @@ def newton_integration(coeffs,dx,n=5,show=False):
         # determines whether to add a new root at zero(ish)        
         if (step < np.floor(a[i])):
             # add a positive or negative value depending on Descartes Rule of Signs
-            pm = np.sign(F_coeffs[0])*np.sign(F_coeffs[1])
-            Z = [.01 + .01j, -.01 + .01j]
-            step = np.floor(a[i])
+            s = np.floor(a[i])
+            pm = signs[int(s)]*signs[int(s)+1]
+            # Rule of Signs determines direction
+            # 1./gamma(dx-a[i]) determines magnitude
+            #Z = [.1 + .01j, -.1 + .01j]
+            Z = [.1001 + .001j, -.1 + .0j]
+            step = s
         else:
             Z = []
 
@@ -251,7 +258,7 @@ def newton_integration(coeffs,dx,n=5,show=False):
             else:
                 Z.append(z)
         
-        Roots = np.array(Z)
+        Roots = np.unique(Z)
         
         if show:
             plt.scatter(Roots.real,Roots.imag,color='orange',alpha=.2)
