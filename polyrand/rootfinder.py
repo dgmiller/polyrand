@@ -12,6 +12,20 @@ def G(k,a):
 def F(k,a):
     return (gamma(k-a+1)/gamma(k+1))
 
+def gen_coeffs(n,dist='normal'):
+    if dist == 'uniform':
+        coeffs = np.random.uniform(0,1,size=n)
+        coeffs[-1] = 1.
+        return coeffs
+    else:
+        coeffs = np.random.randn(n)
+        coeffs[-1] = 1.
+        return coeffs
+
+def fracdiff(coeffs,a):
+    return frac_deriv(coeffs,a,return_coeffs=True)
+
+
 def frac_deriv(coeffs,a,return_coeffs=False):
     """
     The Matrix Fractional Derivative of a polynomial with given coefficients
