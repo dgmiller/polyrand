@@ -211,6 +211,24 @@ def cheb_nodes(a,b,n):
     return np.sort(np.array(nodes))[::-1]
 
 
+def pm(coeffs):
+    """
+    Determines the direction (plus or minus) a root should travel from the origin.
+    
+    """
+    n_pos = 0
+    s = np.sign(coeffs[::-1])
+    # determine number of positive roots
+    for i in range(len(coeffs)-1):
+        # this indicates a sign change which implies a positive root
+        if s[i]*s[i+1] == -1:
+            n_pos += 1
+    
+    # define new s to find number of negative roots
+    s = [-s[i] if i%2 == 1 else s[i] for i in range(len(s))]
+    
+    
+
 
 def newton_integration(coeffs,dx,n=5,show=False):
     """
@@ -253,17 +271,16 @@ def newton_integration(coeffs,dx,n=5,show=False):
             # add a positive or negative value depending on Descartes Rule of Signs
             s = np.floor(a[i])
             pm = signs[int(s)]*signs[int(s)+1]
-            # Rule of Signs determines direction
-            # 1./gamma(dx-a[i]) determines magnitude
-            #Z = [.1 + .01j, -.1 + .01j]
-            Z = [.1001 + .001j, -.1 + .0j]
+            #Z = [.1001 + .001j, -.1 + .0j]
+            #Z = [0. + 0.01j]
+            Z = []
             step = s
         else:
             Z = []
 
         # Newton's method to find roots of function to optimize
         for r in Roots:
-            
+
             f = lambda x: P(x)/x**(a[i])
             z = newton(f,r)
             # ignore negative complex region to save on flops

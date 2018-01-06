@@ -18,3 +18,19 @@ def test_frac_antideriv():
     assert np.allclose(rf.frac_antideriv(coeffs,3,const),np.polynomial.polynomial.polycompanion(P.integ(m=3,k=const[::-1]).coef))
 
     
+def test_minimum_number_to_convergence():
+    # test case
+    np.random.seed(1)
+    coeffs = np.random.randn(75)
+    coeffs[-1] = 1.
+
+    for i in range(1,11):
+        for j in range(2,101):
+            try:
+                rts = rf.newton_integration(coeffs,i,n=j)
+                print("dx:",i,"n:",j)
+                break
+            except:
+                if j == 100:
+                    print("dx:",i,"n:",j,"+")
+                continue
