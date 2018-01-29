@@ -228,7 +228,35 @@ def pm(coeffs):
     s = [-s[i] if i%2 == 1 else s[i] for i in range(len(s))]
     
     
+def fractional_newton_method(x0,P,a,maxiters=100):
+    L = [x0]
+    for i in range(maxiters):
+        x1 = x0 - P(x0)/frac_deriv_poly(P,a,x0)
+        L.append(x1)
+        x0 = x1
+    return np.array(L)
+    
+def newton_method(x0,P,maxiters=100):
+    L = [x0]
+    for i in range(maxiters):
+        x1 = x0 - P(x0)/frac_deriv_poly(P,1,x0)
+        L.append(x1)
+        x0 = x1
+    return np.array(L)
 
+def newton_opt(x0,P,maxiters=100):
+    L = [x0]
+    for i in range(maxiters):
+        x1 = x0 - P.deriv(1)(x0)/P.deriv(2)(x0)
+        x0 = x1
+    return np.array(L)
+
+def fractional_newton_opt(x0,P,a,b,maxiters=100):
+    L = [x0]
+    for i in range(maxiters):
+        x1 = x0 - frac_deriv_poly(P,a,x)/frac_deriv_poly(P,b,x)
+        x0 = x1
+    return L
 
 def newton_integration(coeffs,dx,n=5,show=False):
     """
