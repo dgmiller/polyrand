@@ -228,13 +228,22 @@ def pm(coeffs):
     s = [-s[i] if i%2 == 1 else s[i] for i in range(len(s))]
     
     
-def fractional_newton_method(x0,P,a,maxiters=100):
+def fractional_newton_method(P,x0,a,maxiters=150):
     L = [x0]
-    for i in range(maxiters):
+    while True:
         x1 = x0 - P(x0)/frac_deriv_poly(P,a,x0)
         L.append(x1)
-        x0 = x1
+        if len(L) >= maxiters:
+            break
+        elif np.allclose(abs(x1-x0),0):
+            break
+        else:
+            x0 = x1
     return np.array(L)
+
+def frac_newton(P,x0,a,maxiters=100):
+    while True:
+        x1 = x0 - P(x0)/(P.deriv(1)(x0) - P(x0)*a*x0**-1)
     
 def newton_method(x0,P,maxiters=100):
     L = [x0]
@@ -245,18 +254,10 @@ def newton_method(x0,P,maxiters=100):
     return np.array(L)
 
 def newton_opt(x0,P,maxiters=100):
-    L = [x0]
-    for i in range(maxiters):
-        x1 = x0 - P.deriv(1)(x0)/P.deriv(2)(x0)
-        x0 = x1
-    return np.array(L)
+    pass
 
 def fractional_newton_opt(x0,P,a,b,maxiters=100):
-    L = [x0]
-    for i in range(maxiters):
-        x1 = x0 - frac_deriv_poly(P,a,x)/frac_deriv_poly(P,b,x)
-        x0 = x1
-    return L
+    pass
 
 def newton_integration(coeffs,dx,n=5,show=False):
     """
@@ -294,14 +295,18 @@ def newton_integration(coeffs,dx,n=5,show=False):
         F_coeffs = frac_deriv(coeffs,dx-a[i],return_coeffs=True)
         P = np.polynomial.polynomial.Polynomial(F_coeffs)
         
+        # used for fractional newton's method
+        #dF_coeffs = frac_deriv(coeffs,dx-a[i]-1.01,return_coeffs=True)
+        #dP = np.polynomial.polynomial.Polynomial(dF_coeffs)
+        
         # determines whether to add a new root at zero(ish)        
         if (step < np.floor(a[i])):
             # add a positive or negative value depending on Descartes Rule of Signs
             s = np.floor(a[i])
             pm = signs[int(s)]*signs[int(s)+1]
             #Z = [.1001 + .001j, -.1 + .0j]
-            #Z = [0. + 0.01j]
-            Z = []
+            Z = [0.01 + 0.j]
+            #Z = []
             step = s
         else:
             Z = []
@@ -310,7 +315,19 @@ def newton_integration(coeffs,dx,n=5,show=False):
         for r in Roots:
 
             f = lambda x: P(x)/x**(a[i])
-            z = newton(f,r)
+            try:
+                z = newton(f,r)
+            except:
+                try:
+                    # used for fractional newton's method
+                    dF_coeffs = frac_deriv(coeffs,dx-a[i]-1.05,return_coeffs=True)
+                    dP = np.polynomial.polynomial.Polynomial(dF_coeffs)
+                    df = lambda x: P.deriv(1)(x)*x**1.05
+                    z = newton(P,r,fprime=df,maxiter=150)
+                    print("fractional newton converged!")
+                except:
+                    print("missed one!")
+                    continue
             # ignore negative complex region to save on flops
             if z.imag < 0:
                 Z.append(np.conjugate(z))
