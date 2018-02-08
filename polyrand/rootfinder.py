@@ -228,7 +228,7 @@ def pm(coeffs):
     s = [-s[i] if i%2 == 1 else s[i] for i in range(len(s))]
     
     
-def fractional_newton_method(P,x0,a,maxiters=150):
+def fractional_newton_method(P,x0,a,maxiters=500):
     L = [x0]
     while True:
         x1 = x0 - P(x0)/frac_deriv_poly(P,a,x0)
@@ -347,3 +347,49 @@ def newton_integration(coeffs,dx,n=5,show=False):
         plt.show()
         
     return Roots
+
+def animate_frac_roots(P,x0,dx,t_interval=200,plot_range=[(-1,1),(-1,1)]):
+    """
+    animate fractional newton method
+    """
+    R = fractional_newton_method(P,x0,dx)
+    n_frames = len(R)
+
+    fig = plt.figure(figsize=(8,8))
+    ax = plt.gca()
+    
+    plt.xlim(plot_range[0])
+    plt.ylim(plot_range[1])
+
+    points, = plt.plot([], [], color='r', marker='o', ls='None')
+
+    line, = plt.plot([], [], color='orange', marker='o', ls='None', alpha=.3)
+    greyline, = plt.plot([], [], color='grey', marker='o', ls='None', alpha=.2)
+
+    # initialization function: plot the background of each frame
+    def init():
+        greyline.set_data([],[])
+        line.set_data([], [])
+        points.set_data([], [])
+        return (greyline, line, points,)
+
+    # animation function. This is called sequentially
+    def animate(i):
+
+        # make the orange and grey trails
+        if i-15 >= 0:
+            line.set_data(R[i-15:i].real, R[i-15:i].imag)
+            greyline.set_data(R[:i-15].real, R[:i-15].imag)
+        else:
+            line.set_data(R[:i].real, R[:i].imag)
+            
+        # get the current roots (red)
+        points.set_data(R[i].real, R[i].imag)
+
+        
+        return (greyline, line, points,)
+
+    # call the animator. blit=True means only re-draw the parts that have changed.
+    anim = animation.FuncAnimation(fig, animate, init_func=init, frames=n_frames, interval=t_interval, blit=True)
+
+    return HTML(anim.to_html5_video())
