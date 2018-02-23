@@ -54,7 +54,14 @@ def p_type(coeffs, basis='power'):
 
 
 # generate several random polynomials with various distributions and plot their roots
-def poly_roots(coeffs,basis='power',dx=None,plot_range=1,correction=False,return_values=False,plot_lim=[(-1.5,1.5),(-1.5,1.5)],niters=1):
+def poly_roots(coeffs,
+               basis='power',
+               dx=None,
+               plot_range=1,
+               correction=False,
+               return_values=False,
+               plot_lim=[(-1.5,1.5),(-1.5,1.5)],
+               niters=1):
     """
     Plot random polynomials and their roots with coefficients specified by params.
     
@@ -111,7 +118,7 @@ def poly_roots(coeffs,basis='power',dx=None,plot_range=1,correction=False,return
         plt.title("P(x), degree %s" % (len(coeffs)-1))
 
         plt.subplot(1,2,2)
-        plt.scatter(X,Y,alpha=.4,s=10)
+        plt.scatter(X,Y,alpha=.4,s=10,color='grey')
         if dx is not None:
             for dx_,dy_ in zip(dX,dY):
                 plt.scatter(dx_,dy_,alpha=.1,s=10,color=colors[step%3],edgecolors=None)
@@ -134,7 +141,7 @@ def poly_roots(coeffs,basis='power',dx=None,plot_range=1,correction=False,return
 
     
 # generate several random polynomials with various distributions and plot their roots
-def poly_deriv_roots(coeffs,basis='power',dx=1,niters=1,show_dx_roots=True):
+def poly_deriv_roots(coeffs,basis='power',dx=1,niters=1,show_dx_roots=True,saveas=None,figtitle=None):
     """
     Plot random polynomials and their roots with coefficients specified by params.
     
@@ -162,15 +169,22 @@ def poly_deriv_roots(coeffs,basis='power',dx=1,niters=1,show_dx_roots=True):
         dX.append(dR.real)
         dY.append(dR.imag)
 
-    plt.scatter(X,Y,s=10,alpha=.7)
+    plt.scatter(X,Y,s=10,alpha=.7,color='grey')
     if show_dx_roots:
         plt.scatter(dX,dY,s=10,alpha=.7,color='r')
-    plt.title("The Roots of P(x), degree %s" % (len(coeffs)-1))
+    if figtitle:
+        plt.title(figtitle)
+    else:
+        plt.title("The Roots of P(x), degree %s" % (len(coeffs)-1))
     plt.xlabel('real')
     plt.ylabel('imag')
     plt.xlim(-1.5,1.5)
     plt.ylim(-1.5,1.5)
-    plt.show()
+    if saveas:
+        plt.savefig(saveas,bbox='tight')
+        plt.close()
+    else:
+        plt.show()
     
     
     

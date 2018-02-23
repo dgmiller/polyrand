@@ -95,7 +95,7 @@ def plot_frac_deriv_example(n=15):
     plt.show()
     
 
-def timelapse(coeffs,start,stop,n_frames,basis='power',plot_axis=True):
+def timelapse(coeffs,start,stop,n_frames,basis='power',plot_axis=True,saveas=None,figtitle=None):
     
     if basis == 'power':
         P = np.polynomial.polynomial.Polynomial(coeffs)
@@ -125,13 +125,30 @@ def timelapse(coeffs,start,stop,n_frames,basis='power',plot_axis=True):
             D = frac_deriv(P.coef,a)
             ew = np.linalg.eig(D)[0]
             plt.scatter(ew.real,ew.imag,color='orange',alpha=.1)
-    plt.title("Degree %s polynomial" % P.degree())
+    if figtitle:
+        plt.title(figtitle)
+    else:
+        plt.title("roots of degree %s polynomial after %s derivatives" % (P.degree(),stop-start))
     plt.axis('equal')
-    plt.show()
+    if saveas:
+        plt.xlim(-1.2,1.2)
+        plt.ylim(-1.2,1.2)
+        plt.savefig(saveas,bbox="tight")
+        plt.close()
+    else:
+        plt.show()
     
     
 
-def animate_roots(coeffs,start=None,stop=None,n_frames=200,t_interval=75,plot_trail=True,plot_range=[(-1.5,1.5),(-1.5,1.5)]):
+def animate_roots(coeffs,
+                  start=None,
+                  stop=None,
+                  n_frames=200,
+                  t_interval=75,
+                  plot_trail=True,
+                  plot_range=[(-1.5,1.5),(-1.5,1.5)],
+                  saveas=None,
+                  figtitle=None):
     """
     Animate the continuous deformation of the roots of fractional derivatives.
     
@@ -142,6 +159,8 @@ def animate_roots(coeffs,start=None,stop=None,n_frames=200,t_interval=75,plot_tr
         stop = len(coeffs) - 2
 
     fig = plt.figure(figsize=(8,8))
+    if figtitle:
+        plt.title(figtitle)
     ax = plt.gca()
     
     plt.xlim(plot_range[0])
@@ -195,8 +214,13 @@ def animate_roots(coeffs,start=None,stop=None,n_frames=200,t_interval=75,plot_tr
 
     # call the animator. blit=True means only re-draw the parts that have changed.
     anim = animation.FuncAnimation(fig, animate, init_func=init, frames=n_frames, interval=t_interval, blit=False)
-
-    return HTML(anim.to_html5_video())
+    if saveas:
+        Writer = animation.writers['ffmpeg']
+        writer = Writer(fps=15, metadata=dict(artist='DGM'), bitrate=1800)
+        anim.save(saveas,writer)
+        plt.close()
+    else:
+        return HTML(anim.to_html5_video())
 
 
 
