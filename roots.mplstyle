@@ -1,0 +1,17 @@
+font.family: monospace
+
+text.color: grey
+
+axes.titlesize: x-large
+axes.titlepad: 12.0
+axes.labelcolor: grey
+axes.labelpad: 8.0
+axes.spines.left: False
+axes.spines.top: False
+axes.spines.right: False
+axes.spines.bottom: False
+
+xtick.top: False
+xtick.color: grey
+ytick.right: False
+ytick.color: grey
